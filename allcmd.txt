@@ -1,0 +1,91 @@
+//create app
+//npm install --save-dev webpack webpack-cli babel-loader @babel/core @babel/preset-env @babel/preset-react
+
+
+//-css loader dependencies----
+//npm install --save-dev style-loader css-loader
+
+
+
+------create webpack.config.js-----------
+// webpack.config.js
+const path = require('path');
+
+module.exports = {
+  mode: 'production', // or 'development'
+  entry: './src/index.js',
+  output: {
+    filename: 'my-react-sdk.js',
+    path: path.resolve(__dirname, 'dist'),
+    library: 'MyReactSDK',
+    libraryTarget: 'umd',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+        },
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
+  },
+};
+---------------------------------------------------------------------------------------
+
+-------------.babelrc----------------------------------------------------------------
+// .babelrc
+{
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-react"
+  ]
+}
+-----------------------------------------------------------------------------------------
+//root file 
+// src/index.js in your SDK project
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+
+// Expose the App component globally
+window.MyReactSDK = {
+  App: App,
+};
+------------------------------------------------------------------------------------------
+
+
+
+------------------onClient-------------------------------------
+
+ useEffect(() => {
+    // Add the script tag to include the SDK
+    const script = document.createElement("script");
+    script.src =
+      "https://65785e86d2207c0818d1f34c--illustrious-croissant-72f0a5.netlify.app/my-react-sdk.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    // Use the SDK after it's loaded
+    // script.onload = () => {
+    //   const myComponent = new window.MyReactSDK.App(); // Access the SDK from the window object
+    //   document
+    //     .getElementById("sdk-container")
+    //     .appendChild(myComponent.render());
+    // };
+
+    // Clean up the script tag on component unmount
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  --------------use this command--------------------------------------
